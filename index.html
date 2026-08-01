@@ -205,6 +205,12 @@
       transform: translateY(-2px);
     }
 
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .btn-secondary {
       background: rgba(255, 255, 255, 0.5);
       color: var(--text);
@@ -330,6 +336,37 @@
       min-height: 130px;
     }
 
+    /* آپلود فایل عکس */
+    .file-input-wrapper {
+      position: relative;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1.5px dashed var(--primary);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .file-input-wrapper:hover { background: rgba(238, 0, 69, 0.06); }
+    .file-input-wrapper input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+    .file-input-wrapper p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+    .img-preview {
+      margin-top: 10px;
+      width: 100%;
+      max-height: 160px;
+      object-fit: cover;
+      border-radius: 10px;
+      display: none;
+    }
+
     /* ========================================================= */
     /* نمونه‌کارها                                                */
     /* ========================================================= */
@@ -387,7 +424,7 @@
     #adminOverlay.open { display: flex; }
 
     .admin-modal {
-      background: rgba(255, 255, 255, 0.92);
+      background: rgba(255, 255, 255, 0.95);
       border-radius: 20px;
       max-width: 520px;
       width: 100%;
@@ -524,7 +561,7 @@
   </section>
 
   <!-- ========================================================= -->
-  <!-- بخش نمونه‌کارها (متصل به Firestore)                        -->
+  <!-- بخش نمونه‌کارها (متصل به Supabase)                         -->
   <!-- ========================================================= -->
   <section id="portfolio">
     <div class="section-title">
@@ -659,14 +696,18 @@
             <input type="url" id="pUrl" class="form-control" placeholder="https://example.com" required />
           </div>
           <div class="form-group">
-            <label>لینک تصویر پروژه</label>
-            <input type="url" id="pImg" class="form-control" placeholder="https://..." />
+            <label>تصویر پروژه (از گالری یا فایل انتخاب کن)</label>
+            <div class="file-input-wrapper">
+              <p id="fileNameDisplay">برای انتخاب عکس از گالری یا فایل کلیک کن</p>
+              <input type="file" id="pImgFile" accept="image/*" />
+            </div>
+            <img id="imgPreview" class="img-preview" alt="پیش‌نمایش عکس">
           </div>
           <div class="form-group">
             <label>توضیح کوتاه</label>
             <textarea id="pDesc" class="form-control" placeholder="توضیح کوتاهی درباره پروژه..." required></textarea>
           </div>
-          <button type="button" class="btn btn-primary" style="width:100%;" onclick="submitNewPortfolio()">
+          <button type="button" class="btn btn-primary" style="width:100%;" id="submitPortfolioBtn" onclick="submitNewPortfolio()">
             افزودن به نمونه‌کارها
           </button>
           <div id="addPortfolioStatus" class="admin-status"></div>
@@ -701,42 +742,33 @@
   </script>
 
   <!-- ========================================================= -->
-  <!-- Firebase (ذخیره‌سازی دائمی نمونه‌کارها)                    -->
+  <!-- Supabase (ذخیره‌سازی دائمی نمونه‌کارها)                    -->
   <!-- ========================================================= -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import {
-      getFirestore, collection, addDoc, deleteDoc, doc,
-      onSnapshot, query, orderBy, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script>
+    const SUPABASE_URL = "https://podczkcfxllvnjuiaqyk.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBvZGN6a2NmeGxsdm5qdWlhcXlrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU2MDI3NjIsImV4cCI6MjEwMTE3ODc2Mn0.h7BsSIBQEY2mYnzz4U0PlaHST0_1u-mseAIqjuTPnyQ";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCKoqa9iG32DSun-b17cpmvYEn88MFjZKk",
-      authDomain: "nexorastudio-f4ff0.firebaseapp.com",
-      projectId: "nexorastudio-f4ff0",
-      storageBucket: "nexorastudio-f4ff0.firebasestorage.app",
-      messagingSenderId: "175954995565",
-      appId: "1:175954995565:web:ba9666fb3d4fd3ef2dd264",
-      measurementId: "G-1L5Z38HZGS"
-    };
+    const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const portfolioCol = collection(db, "portfolioProjects");
-
-    // رمز ساده ورود به پنل مدیریت — این فقط جلوی کاربر عادی رو می‌گیره،
-    // امنیت واقعی باید بعداً با Firebase Auth + Security Rules تنظیم بشه.
+    // رمز ساده ورود به پنل مدیریت — این فقط جلوی کاربر عادی رو می‌گیره.
+    // امنیت واقعی داده‌ها از طریق Row Level Security توی Supabase تأمین می‌شود.
     const ADMIN_PASSWORD = "fariborz";
     let isAdmin = false;
 
     const PLACEHOLDER_IMG = "https://via.placeholder.com/600x400/f5f5f7/ee0045?text=Nexora+Studio";
 
-    // ---------- نمایش زنده‌ی نمونه‌کارها برای همه بازدیدکننده‌ها ----------
     const grid = document.getElementById("portfolioGrid");
     const adminListEl = document.getElementById("adminPortfolioList");
 
+    function escapeHtml(str) {
+      const d = document.createElement("div");
+      d.innerText = str || "";
+      return d.innerHTML;
+    }
+
     function renderPublicGrid(items) {
-      if (items.length === 0) {
+      if (!items || items.length === 0) {
         grid.innerHTML = `<div class="portfolio-empty">هنوز نمونه‌کاری ثبت نشده است.</div>`;
         return;
       }
@@ -753,7 +785,7 @@
     }
 
     function renderAdminList(items) {
-      if (items.length === 0) {
+      if (!items || items.length === 0) {
         adminListEl.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem;">هنوز پروژه‌ای ثبت نشده.</p>`;
         return;
       }
@@ -771,28 +803,30 @@
       adminListEl.querySelectorAll("button[data-id]").forEach(btn => {
         btn.addEventListener("click", async () => {
           if (confirm("این پروژه حذف بشه؟")) {
-            await deleteDoc(doc(db, "portfolioProjects", btn.dataset.id));
+            const { error } = await sb.from("projects").delete().eq("id", btn.dataset.id);
+            if (!error) loadProjects();
           }
         });
       });
     }
 
-    function escapeHtml(str) {
-      const d = document.createElement("div");
-      d.innerText = str || "";
-      return d.innerHTML;
+    async function loadProjects() {
+      const { data, error } = await sb
+        .from("projects")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        grid.innerHTML = `<div class="portfolio-empty">خطا در بارگذاری نمونه‌کارها. لطفاً بعداً دوباره امتحان کنید.</div>`;
+        console.error(error);
+        return;
+      }
+
+      renderPublicGrid(data);
+      if (isAdmin) renderAdminList(data);
     }
 
-    // گوش‌دادن زنده به تغییرات دیتابیس — همه‌ی کاربران و همه‌ی دستگاه‌ها همزمان آپدیت می‌بینن
-    const q = query(portfolioCol, orderBy("createdAt", "desc"));
-    onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      renderPublicGrid(items);
-      if (isAdmin) renderAdminList(items);
-    }, (err) => {
-      grid.innerHTML = `<div class="portfolio-empty">خطا در بارگذاری نمونه‌کارها. لطفاً بعداً دوباره امتحان کنید.</div>`;
-      console.error(err);
-    });
+    loadProjects();
 
     // ---------- پنل مدیریت ----------
     const overlay = document.getElementById("adminOverlay");
@@ -817,17 +851,39 @@
         loginStep.style.display = "none";
         panelStep.style.display = "block";
         statusEl.innerText = "";
+        loadProjects();
       } else {
         statusEl.innerText = "رمز عبور اشتباه است.";
       }
     };
 
+    // ---------- آپلود عکس از فایل (تبدیل به Base64) ----------
+    let selectedImageBase64 = "";
+    const fileInput = document.getElementById("pImgFile");
+    const fileNameDisplay = document.getElementById("fileNameDisplay");
+    const imgPreview = document.getElementById("imgPreview");
+
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+
+      fileNameDisplay.innerText = "عکس انتخاب شد: " + file.name;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        selectedImageBase64 = e.target.result;
+        imgPreview.src = selectedImageBase64;
+        imgPreview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    });
+
     window.submitNewPortfolio = async function () {
       const title = document.getElementById("pTitle").value.trim();
       const url = document.getElementById("pUrl").value.trim();
-      const img = document.getElementById("pImg").value.trim();
       const desc = document.getElementById("pDesc").value.trim();
       const statusEl = document.getElementById("addPortfolioStatus");
+      const submitBtn = document.getElementById("submitPortfolioBtn");
 
       if (!title || !url || !desc) {
         statusEl.className = "admin-status error";
@@ -835,22 +891,35 @@
         return;
       }
 
+      submitBtn.disabled = true;
       statusEl.className = "admin-status";
       statusEl.innerText = "در حال انتشار...";
 
-      try {
-        await addDoc(portfolioCol, {
-          title, url, img, desc,
-          createdAt: serverTimestamp()
-        });
-        statusEl.className = "admin-status success";
-        statusEl.innerText = "پروژه با موفقیت اضافه شد!";
-        document.getElementById("addPortfolioForm").reset();
-      } catch (err) {
+      const { error } = await sb.from("projects").insert({
+        title,
+        url,
+        img: selectedImageBase64 || "",
+        desc
+      });
+
+      submitBtn.disabled = false;
+
+      if (error) {
         statusEl.className = "admin-status error";
         statusEl.innerText = "خطا در ثبت پروژه. دوباره امتحان کنید.";
-        console.error(err);
+        console.error(error);
+        return;
       }
+
+      statusEl.className = "admin-status success";
+      statusEl.innerText = "پروژه با موفقیت اضافه شد!";
+      document.getElementById("addPortfolioForm").reset();
+      selectedImageBase64 = "";
+      imgPreview.style.display = "none";
+      imgPreview.src = "";
+      fileNameDisplay.innerText = "برای انتخاب عکس از گالری یا فایل کلیک کن";
+
+      loadProjects();
     };
   </script>
 </body>
