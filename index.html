@@ -71,6 +71,7 @@
     nav {
       display: flex;
       gap: 2rem;
+      align-items: center;
     }
 
     nav a {
@@ -84,6 +85,19 @@
     nav a:hover {
       color: var(--primary);
     }
+
+    #adminEntryBtn {
+      background: transparent;
+      border: 1px solid rgba(238, 0, 69, 0.3);
+      color: var(--primary);
+      padding: 0.45rem 1rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    #adminEntryBtn:hover { background: var(--primary); color: #fff; }
 
     /* بخش‌ها */
     main, section {
@@ -203,6 +217,15 @@
       transform: translateY(-2px);
     }
 
+    .btn-danger {
+      background: rgba(238, 0, 69, 0.1);
+      color: var(--primary);
+      border: 1px solid rgba(238, 0, 69, 0.25);
+    }
+    .btn-danger:hover { background: var(--primary); color: #fff; }
+
+    .btn-small { padding: 0.5rem 1rem; font-size: 0.82rem; border-radius: 9px; }
+
     /* شبکه کارت‌ها */
     .grid-3 {
       display: grid;
@@ -307,6 +330,118 @@
       min-height: 130px;
     }
 
+    /* ========================================================= */
+    /* نمونه‌کارها                                                */
+    /* ========================================================= */
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .portfolio-card {
+      overflow: hidden;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .portfolio-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: rgba(0,0,0,0.05);
+    }
+
+    .portfolio-card .portfolio-body {
+      padding: 1.5rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .portfolio-card h3 { font-size: 1.1rem; color: var(--dark); margin-bottom: 0.5rem; }
+    .portfolio-card p { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.2rem; flex: 1; }
+
+    .portfolio-empty, .portfolio-loading {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: var(--text-muted);
+      padding: 2rem;
+    }
+
+    /* ========================================================= */
+    /* پنل مدیریت (مودال)                                        */
+    /* ========================================================= */
+    #adminOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 17, 21, 0.55);
+      backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    #adminOverlay.open { display: flex; }
+
+    .admin-modal {
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 20px;
+      max-width: 520px;
+      width: 100%;
+      max-height: 88vh;
+      overflow-y: auto;
+      padding: 2rem;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .admin-modal h2 {
+      font-size: 1.3rem;
+      color: var(--dark);
+      margin-bottom: 1.2rem;
+    }
+
+    #closeAdminBtn {
+      position: absolute;
+      top: 1.2rem;
+      left: 1.2rem;
+      background: rgba(0,0,0,0.05);
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1rem;
+      color: var(--text-muted);
+    }
+
+    .admin-list-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .admin-list-item img {
+      width: 46px; height: 46px; border-radius: 8px; object-fit: cover; flex-shrink: 0;
+      background: rgba(0,0,0,0.05);
+    }
+    .admin-list-item .item-info { flex: 1; min-width: 0; }
+    .admin-list-item .item-info strong { display: block; font-size: 0.9rem; color: var(--dark); }
+    .admin-list-item .item-info span { font-size: 0.78rem; color: var(--text-muted); }
+
+    .admin-status {
+      font-size: 0.85rem;
+      margin-top: 8px;
+      min-height: 18px;
+      font-weight: 600;
+    }
+    .admin-status.error { color: var(--primary); }
+    .admin-status.success { color: #16a34a; }
+
     /* فوتر */
     footer {
       text-align: center;
@@ -339,8 +474,10 @@
     <nav>
       <a href="#hero">خانه</a>
       <a href="#services">خدمات</a>
+      <a href="#portfolio">نمونه‌کارها</a>
       <a href="#features">ویژگی‌ها</a>
       <a href="#contact">ثبت سفارش</a>
+      <button id="adminEntryBtn">ورود مدیر</button>
     </nav>
   </header>
 
@@ -383,6 +520,20 @@
         <h3>پردازش توزیع‌شده</h3>
         <p>مدیریت بارهای کاری سنگین با استفاده از شبکه‌های توزیع‌شده و سیستم‌های هوشمند تعادل بار.</p>
       </div>
+    </div>
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- بخش نمونه‌کارها (متصل به Firestore)                        -->
+  <!-- ========================================================= -->
+  <section id="portfolio">
+    <div class="section-title">
+      <h2>نمونه‌کارهای <span style="color: var(--primary);">Nexora</span></h2>
+      <p>جدیدترین وب‌سایت‌ها و پروژه‌های طراحی‌شده توسط تیم ما</p>
+    </div>
+
+    <div class="portfolio-grid" id="portfolioGrid">
+      <div class="portfolio-loading">در حال بارگذاری نمونه‌کارها...</div>
     </div>
   </section>
 
@@ -477,6 +628,56 @@
     <p>© ۲۰۲۶ تمامی حقوق برای پلتفرم Nexora محفوظ است.</p>
   </footer>
 
+  <!-- ========================================================= -->
+  <!-- پنل مدیریت (مودال)                                        -->
+  <!-- ========================================================= -->
+  <div id="adminOverlay">
+    <div class="admin-modal">
+      <button id="closeAdminBtn">✕</button>
+
+      <!-- مرحله ورود با رمز -->
+      <div id="adminLoginStep">
+        <h2>ورود به پنل مدیریت</h2>
+        <div class="form-group">
+          <label for="adminPassInput">رمز عبور</label>
+          <input type="password" id="adminPassInput" class="form-control" placeholder="رمز مدیر را وارد کنید" />
+        </div>
+        <button class="btn btn-primary" style="width:100%;" onclick="tryAdminLogin()">ورود</button>
+        <div id="adminLoginStatus" class="admin-status error"></div>
+      </div>
+
+      <!-- پنل مدیریت اصلی -->
+      <div id="adminPanelStep" style="display:none;">
+        <h2>افزودن نمونه‌کار جدید</h2>
+        <form id="addPortfolioForm" onsubmit="return false;">
+          <div class="form-group">
+            <label>عنوان پروژه</label>
+            <input type="text" id="pTitle" class="form-control" placeholder="مثال: فروشگاه اینترنتی طلا" required />
+          </div>
+          <div class="form-group">
+            <label>آدرس سایت (URL)</label>
+            <input type="url" id="pUrl" class="form-control" placeholder="https://example.com" required />
+          </div>
+          <div class="form-group">
+            <label>لینک تصویر پروژه</label>
+            <input type="url" id="pImg" class="form-control" placeholder="https://..." />
+          </div>
+          <div class="form-group">
+            <label>توضیح کوتاه</label>
+            <textarea id="pDesc" class="form-control" placeholder="توضیح کوتاهی درباره پروژه..." required></textarea>
+          </div>
+          <button type="button" class="btn btn-primary" style="width:100%;" onclick="submitNewPortfolio()">
+            افزودن به نمونه‌کارها
+          </button>
+          <div id="addPortfolioStatus" class="admin-status"></div>
+        </form>
+
+        <h2 style="margin-top: 2rem;">پروژه‌های ثبت‌شده</h2>
+        <div id="adminPortfolioList"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- کتابخانه‌های Vanta و Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
@@ -497,6 +698,160 @@
       size: 0.60,
       backgroundColor: 0xf5f5f7
     });
+  </script>
+
+  <!-- ========================================================= -->
+  <!-- Firebase (ذخیره‌سازی دائمی نمونه‌کارها)                    -->
+  <!-- ========================================================= -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc, deleteDoc, doc,
+      onSnapshot, query, orderBy, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCKoqa9iG32DSun-b17cpmvYEn88MFjZKk",
+      authDomain: "nexorastudio-f4ff0.firebaseapp.com",
+      projectId: "nexorastudio-f4ff0",
+      storageBucket: "nexorastudio-f4ff0.firebasestorage.app",
+      messagingSenderId: "175954995565",
+      appId: "1:175954995565:web:ba9666fb3d4fd3ef2dd264",
+      measurementId: "G-1L5Z38HZGS"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const portfolioCol = collection(db, "portfolioProjects");
+
+    // رمز ساده ورود به پنل مدیریت — این فقط جلوی کاربر عادی رو می‌گیره،
+    // امنیت واقعی باید بعداً با Firebase Auth + Security Rules تنظیم بشه.
+    const ADMIN_PASSWORD = "fariborz";
+    let isAdmin = false;
+
+    const PLACEHOLDER_IMG = "https://via.placeholder.com/600x400/f5f5f7/ee0045?text=Nexora+Studio";
+
+    // ---------- نمایش زنده‌ی نمونه‌کارها برای همه بازدیدکننده‌ها ----------
+    const grid = document.getElementById("portfolioGrid");
+    const adminListEl = document.getElementById("adminPortfolioList");
+
+    function renderPublicGrid(items) {
+      if (items.length === 0) {
+        grid.innerHTML = `<div class="portfolio-empty">هنوز نمونه‌کاری ثبت نشده است.</div>`;
+        return;
+      }
+      grid.innerHTML = items.map(p => `
+        <div class="glass-card portfolio-card">
+          <img src="${p.img || PLACEHOLDER_IMG}" alt="${escapeHtml(p.title)}" onerror="this.src='${PLACEHOLDER_IMG}'">
+          <div class="portfolio-body">
+            <h3>${escapeHtml(p.title)}</h3>
+            <p>${escapeHtml(p.desc)}</p>
+            <a href="${p.url}" target="_blank" rel="noopener" class="btn btn-primary btn-small">مشاهده وب‌سایت</a>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderAdminList(items) {
+      if (items.length === 0) {
+        adminListEl.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem;">هنوز پروژه‌ای ثبت نشده.</p>`;
+        return;
+      }
+      adminListEl.innerHTML = items.map(p => `
+        <div class="admin-list-item">
+          <img src="${p.img || PLACEHOLDER_IMG}" onerror="this.src='${PLACEHOLDER_IMG}'">
+          <div class="item-info">
+            <strong>${escapeHtml(p.title)}</strong>
+            <span>${escapeHtml(p.url)}</span>
+          </div>
+          <button class="btn btn-danger btn-small" data-id="${p.id}">حذف</button>
+        </div>
+      `).join("");
+
+      adminListEl.querySelectorAll("button[data-id]").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          if (confirm("این پروژه حذف بشه؟")) {
+            await deleteDoc(doc(db, "portfolioProjects", btn.dataset.id));
+          }
+        });
+      });
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement("div");
+      d.innerText = str || "";
+      return d.innerHTML;
+    }
+
+    // گوش‌دادن زنده به تغییرات دیتابیس — همه‌ی کاربران و همه‌ی دستگاه‌ها همزمان آپدیت می‌بینن
+    const q = query(portfolioCol, orderBy("createdAt", "desc"));
+    onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderPublicGrid(items);
+      if (isAdmin) renderAdminList(items);
+    }, (err) => {
+      grid.innerHTML = `<div class="portfolio-empty">خطا در بارگذاری نمونه‌کارها. لطفاً بعداً دوباره امتحان کنید.</div>`;
+      console.error(err);
+    });
+
+    // ---------- پنل مدیریت ----------
+    const overlay = document.getElementById("adminOverlay");
+    const loginStep = document.getElementById("adminLoginStep");
+    const panelStep = document.getElementById("adminPanelStep");
+
+    document.getElementById("adminEntryBtn").addEventListener("click", () => {
+      overlay.classList.add("open");
+    });
+    document.getElementById("closeAdminBtn").addEventListener("click", () => {
+      overlay.classList.remove("open");
+    });
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) overlay.classList.remove("open");
+    });
+
+    window.tryAdminLogin = function () {
+      const pass = document.getElementById("adminPassInput").value;
+      const statusEl = document.getElementById("adminLoginStatus");
+      if (pass === ADMIN_PASSWORD) {
+        isAdmin = true;
+        loginStep.style.display = "none";
+        panelStep.style.display = "block";
+        statusEl.innerText = "";
+      } else {
+        statusEl.innerText = "رمز عبور اشتباه است.";
+      }
+    };
+
+    window.submitNewPortfolio = async function () {
+      const title = document.getElementById("pTitle").value.trim();
+      const url = document.getElementById("pUrl").value.trim();
+      const img = document.getElementById("pImg").value.trim();
+      const desc = document.getElementById("pDesc").value.trim();
+      const statusEl = document.getElementById("addPortfolioStatus");
+
+      if (!title || !url || !desc) {
+        statusEl.className = "admin-status error";
+        statusEl.innerText = "لطفاً فیلدهای ضروری را پر کنید.";
+        return;
+      }
+
+      statusEl.className = "admin-status";
+      statusEl.innerText = "در حال انتشار...";
+
+      try {
+        await addDoc(portfolioCol, {
+          title, url, img, desc,
+          createdAt: serverTimestamp()
+        });
+        statusEl.className = "admin-status success";
+        statusEl.innerText = "پروژه با موفقیت اضافه شد!";
+        document.getElementById("addPortfolioForm").reset();
+      } catch (err) {
+        statusEl.className = "admin-status error";
+        statusEl.innerText = "خطا در ثبت پروژه. دوباره امتحان کنید.";
+        console.error(err);
+      }
+    };
   </script>
 </body>
 </html>
