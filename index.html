@@ -36,7 +36,7 @@
       background-color: transparent;
     }
 
-    /* ۱. بوم سه‌بعدی ثابت در تمام طول صفحه */
+    /* پس‌زمینه سه بعدی ثابت */
     #vanta-canvas {
       position: fixed;
       top: 0;
@@ -46,7 +46,7 @@
       z-index: -1;
     }
 
-    /* ۲. هدر شیشه‌ای شفاف */
+    /* هدر شیشه‌ای */
     header {
       display: flex;
       justify-content: space-between;
@@ -66,11 +66,12 @@
       font-weight: 900;
       color: var(--primary);
       letter-spacing: -0.5px;
+      cursor: pointer;
     }
 
     nav {
       display: flex;
-      gap: 2rem;
+      gap: 1.8rem;
       align-items: center;
     }
 
@@ -80,9 +81,10 @@
       font-weight: 600;
       font-size: 0.95rem;
       transition: color 0.3s ease;
+      cursor: pointer;
     }
 
-    nav a:hover {
+    nav a:hover, nav a.active {
       color: var(--primary);
     }
 
@@ -99,8 +101,22 @@
     }
     #adminEntryBtn:hover { background: var(--primary); color: #fff; }
 
-    /* بخش‌ها */
-    main, section {
+    /* مدیریت نمایش صفحه‌ها */
+    .view-page {
+      display: block;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+    .view-page.hidden {
+      display: none !important;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* استایل عمومی بخش‌ها */
+    section {
       position: relative;
       z-index: 1;
       padding: 5rem 8%;
@@ -126,16 +142,7 @@
       font-size: 1rem;
     }
 
-    /* Hero Section */
-    .hero-container {
-      min-height: calc(100vh - 80px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding-top: 2rem;
-      padding-bottom: 2rem;
-    }
-
+    /* کارت‌های شیشه‌ای */
     .glass-card {
       background: var(--glass-bg);
       backdrop-filter: blur(20px);
@@ -144,6 +151,16 @@
       border-radius: 24px;
       padding: 3.5rem 2.5rem;
       box-shadow: var(--glass-shadow);
+    }
+
+    /* Hero Section */
+    .hero-container {
+      min-height: calc(100vh - 80px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-top: 2rem;
+      padding-bottom: 2rem;
     }
 
     .hero-card {
@@ -192,6 +209,9 @@
       transition: all 0.3s ease;
       cursor: pointer;
       border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .btn-primary {
@@ -203,12 +223,6 @@
     .btn-primary:hover {
       background: var(--primary-hover);
       transform: translateY(-2px);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
     }
 
     .btn-secondary {
@@ -367,9 +381,7 @@
       display: none;
     }
 
-    /* ========================================================= */
-    /* نمونه‌کارها                                                */
-    /* ========================================================= */
+    /* نمونه‌کارها */
     .portfolio-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -407,9 +419,63 @@
       padding: 2rem;
     }
 
-    /* ========================================================= */
-    /* پنل مدیریت (مودال)                                        */
-    /* ========================================================= */
+    /* ویرایشگر زنده کد */
+    .editor-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      height: 600px;
+      margin-top: 2rem;
+    }
+
+    .editor-box, .preview-box {
+      border-radius: 18px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--glass-border);
+      background: rgba(15, 17, 21, 0.85);
+      backdrop-filter: blur(20px);
+      box-shadow: var(--glass-shadow);
+    }
+
+    .editor-header {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.8rem 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .editor-textarea {
+      flex: 1;
+      width: 100%;
+      background: transparent;
+      color: #33ff99;
+      font-family: monospace;
+      padding: 1.2rem;
+      border: none;
+      outline: none;
+      resize: none;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      direction: ltr;
+      text-align: left;
+    }
+
+    .preview-iframe {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #ffffff;
+    }
+
+    /* پنل مدیریت (مودال) */
     #adminOverlay {
       position: fixed;
       inset: 0;
@@ -435,11 +501,7 @@
       position: relative;
     }
 
-    .admin-modal h2 {
-      font-size: 1.3rem;
-      color: var(--dark);
-      margin-bottom: 1.2rem;
-    }
+    .admin-modal h2 { font-size: 1.3rem; color: var(--dark); margin-bottom: 1.2rem; }
 
     #closeAdminBtn {
       position: absolute;
@@ -494,171 +556,234 @@
 
     @media (max-width: 768px) {
       header { flex-direction: column; gap: 1rem; }
-      nav { gap: 1rem; }
+      nav { gap: 1rem; flex-wrap: wrap; justify-content: center; }
       h1 { font-size: 2rem; }
       .cta-group { flex-direction: column; }
+      .editor-container { grid-template-columns: 1fr; height: auto; }
+      .editor-box, .preview-box { height: 350px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- پس‌زمینه ۳ بعدی ثابت در لایه پایینی -->
+  <!-- پس‌زمینه ۳ بعدی ثابت -->
   <div id="vanta-canvas"></div>
 
-  <!-- هدر -->
+  <!-- هدر با ناوبری هوشمند -->
   <header>
-    <div class="logo">NEXORA</div>
+    <div class="logo" onclick="navigateToSection('hero')">NEXORA</div>
     <nav>
-      <a href="#hero">خانه</a>
-      <a href="#services">خدمات</a>
-      <a href="#portfolio">نمونه‌کارها</a>
-      <a href="#features">ویژگی‌ها</a>
-      <a href="#contact">ثبت سفارش</a>
+      <a onclick="navigateToSection('hero')" class="nav-link active" data-target="hero">خانه</a>
+      <a onclick="navigateToSection('services')" class="nav-link" data-target="services">خدمات</a>
+      <a onclick="navigateToSection('portfolio')" class="nav-link" data-target="portfolio">نمونه‌کارها</a>
+      <a onclick="navigateToSection('features')" class="nav-link" data-target="features">ویژگی‌ها</a>
+      <a onclick="navigateToSection('contact')" class="nav-link" data-target="contact">ثبت سفارش</a>
+      <a onclick="openEditorPage()" class="nav-link" data-target="editor">کدنویسی زنده</a>
       <button id="adminEntryBtn">ورود مدیر</button>
     </nav>
   </header>
 
-  <!-- Hero Section -->
-  <main id="hero" class="hero-container">
-    <div class="glass-card hero-card">
-      <span class="tag">نسل جدید ارتباطات شبکه‌ای</span>
-      <h1>توسعه زیرساخت‌های جهانی در یک بستر هوشمند</h1>
-      <p>ارائه‌دهنده راه‌کارهای یکپارچه نرم‌افزاری و پردازش ابری. داده‌های خود را با سرعت و امنیت بالا در مقیاس جهانی مدیریت کنید.</p>
-      
-      <div class="cta-group">
-        <a href="#contact" class="btn btn-primary">ثبت سفارش مستقیم</a>
-        <a href="#services" class="btn btn-secondary">مشاهده خدمات</a>
-      </div>
-    </div>
-  </main>
-
-  <!-- بخش خدمات -->
-  <section id="services">
-    <div class="section-title">
-      <h2>خدمات تخصصی ما</h2>
-      <p>راه‌کارهای نوآورانه برای ارتقای کسب‌وکار شما</p>
-    </div>
-
-    <div class="grid-3">
-      <div class="glass-card feature-card">
-        <div class="icon-box">☁️</div>
-        <h3>زیرساخت ابری</h3>
-        <p>سرورهای مجازی و اختصاصی با پهنای باند نامحدود و تاخیر بسیار پایین در سراسر نقاط کلیدی جهان.</p>
-      </div>
-
-      <div class="glass-card feature-card">
-        <div class="icon-box">🛡️</div>
-        <h3>امنیت سایبری</h3>
-        <p>حفاظت پیشرفته در برابر حملات DDoS و رمزنگاری چندلایه‌ای داده‌ها جهت حفظ حریم خصوصی.</p>
-      </div>
-
-      <div class="glass-card feature-card">
-        <div class="icon-box">⚡</div>
-        <h3>پردازش توزیع‌شده</h3>
-        <p>مدیریت بارهای کاری سنگین با استفاده از شبکه‌های توزیع‌شده و سیستم‌های هوشمند تعادل بار.</p>
-      </div>
-    </div>
-  </section>
-
   <!-- ========================================================= -->
-  <!-- بخش نمونه‌کارها (متصل به Supabase)                         -->
+  <!-- ۱. صفحه اصلی تک‌صفحه‌ای (Main Single Page)               -->
   <!-- ========================================================= -->
-  <section id="portfolio">
-    <div class="section-title">
-      <h2>نمونه‌کارهای <span style="color: var(--primary);">Nexora</span></h2>
-      <p>جدیدترین وب‌سایت‌ها و پروژه‌های طراحی‌شده توسط تیم ما</p>
-    </div>
-
-    <div class="portfolio-grid" id="portfolioGrid">
-      <div class="portfolio-loading">در حال بارگذاری نمونه‌کارها...</div>
-    </div>
-  </section>
-
-  <!-- بخش ویژگی‌ها -->
-  <section id="features">
-    <div class="section-title">
-      <h2>چرا Nexora؟</h2>
-      <p>استانداردهایی که ما را متمایز می‌سازد</p>
-    </div>
-
-    <div class="grid-3">
-      <div class="glass-card feature-card">
-        <h3>پایداری ۹۹.۹٪</h3>
-        <p>تضمین آپ‌تایم بالا و پایداری کامل سرویس‌ها بدون قطعی در شرایط بحرانی.</p>
-      </div>
-
-      <div class="glass-card feature-card">
-        <h3>پشتیبانی ۲۴/۷</h3>
-        <p>تیم متخصصان فنی ما در تمامی ساعات شبانه‌روز آماده پاسخگویی و رفع مشکلات هستند.</p>
-      </div>
-
-      <div class="glass-card feature-card">
-        <h3>رابط کاربری هوشمند</h3>
-        <p>پنل مدیریت قدرتمند با طراحی مدرن و قابلیت‌های تحلیل آنی داده‌ها.</p>
-      </div>
-    </div>
-
-    <!-- آمار -->
-    <div class="stats-container" style="margin-top: 4rem;">
-      <div class="glass-card stat-item">
-        <h3>+۵۰K</h3>
-        <p>کاربر فعال</p>
-      </div>
-      <div class="glass-card stat-item">
-        <h3>۹۹.۹٪</h3>
-        <p>رضایت مشتریان</p>
-      </div>
-      <div class="glass-card stat-item">
-        <h3>+۱۲۰</h3>
-        <p>کشور تحت پوشش</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- بخش فرم ثبت سفارش (متصل به ایمیل) -->
-  <section id="contact">
-    <div class="section-title">
-      <h2>ثبت سفارش و ارسال پیام</h2>
-      <p>اطلاعات زیر را پر کنید؛ درخواست شما مستقیماً به ایمیل پشتیبانی ارسال خواهد شد.</p>
-    </div>
-
-    <div class="contact-wrapper">
-      <form class="glass-card" action="https://formspree.io/f/xvzenvkk" method="POST">
+  <div id="main-view" class="view-page">
+    
+    <!-- Hero Section -->
+    <section id="hero" class="hero-container">
+      <div class="glass-card hero-card">
+        <span class="tag">نسل جدید ارتباطات شبکه‌ای</span>
+        <h1>توسعه زیرساخت‌های جهانی در یک بستر هوشمند</h1>
+        <p>ارائه‌دهنده راه‌کارهای یکپارچه نرم‌افزاری و پردازش ابری. داده‌های خود را با سرعت و امنیت بالا در مقیاس جهانی مدیریت کنید.</p>
         
-        <div class="form-group">
-          <label for="name">نام و نام خانوادگی</label>
-          <input type="text" id="name" name="نام خریدار" class="form-control" placeholder="مثال: فریبرز رحیمی" required />
+        <div class="cta-group">
+          <a onclick="navigateToSection('contact')" class="btn btn-primary">ثبت سفارش مستقیم</a>
+          <a onclick="navigateToSection('services')" class="btn btn-secondary">مشاهده خدمات</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services">
+      <div class="section-title">
+        <h2>خدمات تخصصی ما</h2>
+        <p>راه‌کارهای نوآورانه برای ارتقای کسب‌وکار شما</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="glass-card feature-card">
+          <div class="icon-box">☁️</div>
+          <h3>زیرساخت ابری</h3>
+          <p>سرورهای مجازی و اختصاصی با پهنای باند نامحدود و تاخیر بسیار پایین در سراسر نقاط کلیدی جهان.</p>
         </div>
 
-        <div class="form-group">
-          <label for="email">آدرس ایمیل شما</label>
-          <input type="email" id="email" name="ایمیل خریدار" class="form-control" placeholder="name@example.com" required />
+        <div class="glass-card feature-card">
+          <div class="icon-box">🛡️</div>
+          <h3>امنیت سایبری</h3>
+          <p>حفاظت پیشرفته در برابر حملات DDoS و رمزنگاری چندلایه‌ای داده‌ها جهت حفظ حریم خصوصی.</p>
         </div>
 
-        <div class="form-group">
-          <label for="phone">شماره تماس یا آیدی تلگرام</label>
-          <input type="tel" id="phone" name="شماره تماس" class="form-control" placeholder="۰۹۱۲..." required />
+        <div class="glass-card feature-card">
+          <div class="icon-box">⚡</div>
+          <h3>پردازش توزیع‌شده</h3>
+          <p>مدیریت بارهای کاری سنگین با استفاده از شبکه‌های توزیع‌شده و سیستم‌های هوشمند تعادل بار.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio">
+      <div class="section-title">
+        <h2>نمونه‌کارهای <span style="color: var(--primary);">Nexora</span></h2>
+        <p>جدیدترین وب‌سایت‌ها و پروژه‌های طراحی‌شده توسط تیم ما</p>
+      </div>
+
+      <div class="portfolio-grid" id="portfolioGrid">
+        <div class="portfolio-loading">در حال بارگذاری نمونه‌کارها...</div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features">
+      <div class="section-title">
+        <h2>چرا Nexora؟</h2>
+        <p>استانداردهایی که ما را متمایز می‌سازد</p>
+      </div>
+
+      <div class="grid-3">
+        <div class="glass-card feature-card">
+          <h3>پایداری ۹۹.۹٪</h3>
+          <p>تضمین آپ‌تایم بالا و پایداری کامل سرویس‌ها بدون قطعی در شرایط بحرانی.</p>
         </div>
 
-        <div class="form-group">
-          <label for="service">نوع سرویس مورد نظر</label>
-          <select id="service" name="نوع سفارش" class="form-control" required style="color: var(--text);">
-            <option value="زیرساخت ابری">زیرساخت ابری</option>
-            <option value="امنیت سایبری">امنیت سایبری</option>
-            <option value="پردازش توزیع‌شده">پردازش توزیع‌شده</option>
-            <option value="طراحی و توسعه اختصاصی">طراحی و توسعه اختصاصی</option>
-          </select>
+        <div class="glass-card feature-card">
+          <h3>پشتیبانی ۲۴/۷</h3>
+          <p>تیم متخصصان فنی ما در تمامی ساعات شبانه‌روز آماده پاسخگویی و رفع مشکلات هستند.</p>
         </div>
 
-        <div class="form-group">
-          <label for="message">توضیحات سفارش</label>
-          <textarea id="message" name="توضیحات سفارش" class="form-control" placeholder="جزئیات درخواست یا سفارش خود را بنویسید..." required></textarea>
+        <div class="glass-card feature-card">
+          <h3>رابط کاربری هوشمند</h3>
+          <p>پنل مدیریت قدرتمند با طراحی مدرن و قابلیت‌های تحلیل آنی داده‌ها.</p>
+        </div>
+      </div>
+
+      <div class="stats-container" style="margin-top: 4rem;">
+        <div class="glass-card stat-item">
+          <h3>+۵۰K</h3>
+          <p>کاربر فعال</p>
+        </div>
+        <div class="glass-card stat-item">
+          <h3>۹۹.۹٪</h3>
+          <p>رضایت مشتریان</p>
+        </div>
+        <div class="glass-card stat-item">
+          <h3>+۱۲۰</h3>
+          <p>کشور تحت پوشش</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact & Order Section -->
+    <section id="contact">
+      <div class="section-title">
+        <h2>ثبت سفارش و ارسال پیام</h2>
+        <p>اطلاعات زیر را پر کنید؛ درخواست شما مستقیماً به ایمیل پشتیبانی ارسال خواهد شد.</p>
+      </div>
+
+      <div class="contact-wrapper">
+        <form class="glass-card" action="https://formspree.io/f/xvzenvkk" method="POST">
+          
+          <div class="form-group">
+            <label for="name">نام و نام خانوادگی</label>
+            <input type="text" id="name" name="نام خریدار" class="form-control" placeholder="مثال: فریبرز رحیمی" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">آدرس ایمیل شما</label>
+            <input type="email" id="email" name="ایمیل خریدار" class="form-control" placeholder="name@example.com" required />
+          </div>
+
+          <div class="form-group">
+            <label for="phone">شماره تماس یا آیدی تلگرام</label>
+            <input type="tel" id="phone" name="شماره تماس" class="form-control" placeholder="۰۹۱۲..." required />
+          </div>
+
+          <div class="form-group">
+            <label for="service">نوع سرویس مورد نظر</label>
+            <select id="service" name="نوع سفارش" class="form-control" required style="color: var(--text);">
+              <option value="زیرساخت ابری">زیرساخت ابری</option>
+              <option value="امنیت سایبری">امنیت سایبری</option>
+              <option value="پردازش توزیع‌شده">پردازش توزیع‌شده</option>
+              <option value="طراحی و توسعه اختصاصی">طراحی و توسعه اختصاصی</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="message">توضیحات سفارش</label>
+            <textarea id="message" name="توضیحات سفارش" class="form-control" placeholder="جزئیات درخواست یا سفارش خود را بنویسید..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%;">ثبت و ارسال نهایی سفارش</button>
+        </form>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- ۲. صفحه مجزای کدنویسی زنده (Live Code Editor)            -->
+  <!-- ========================================================= -->
+  <div id="editor-view" class="view-page hidden">
+    <section>
+      <div class="section-title">
+        <h2>ویرایشگر و پیش‌نمایش زنده کد</h2>
+        <p>کد HTML/CSS خود را بنویسید و خروجی آن را همان لحظه به صورت زنده ببینید</p>
+      </div>
+
+      <div class="editor-container">
+        <!-- پنل ویرایشگر -->
+        <div class="editor-box">
+          <div class="editor-header">
+            <span>index.html / css</span>
+            <button class="btn btn-secondary btn-small" id="resetCodeBtn">بازنشانی کد</button>
+          </div>
+          <textarea id="liveCodeInput" class="editor-textarea" spellcheck="false"><style>
+  body {
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: #0f1115;
+    color: #fff;
+  }
+  .card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  h2 { color: #ee0045; margin-bottom: 10px; }
+</style>
+
+<div class="card">
+  <h2>Nexora Studio</h2>
+  <p>ویرایشگر زنده کد به خوبی کار می‌کند!</p>
+</div></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary" style="width: 100%;">ثبت و ارسال نهایی سفارش</button>
-      </form>
-    </div>
-  </section>
+        <!-- پنل پیش‌نمایش -->
+        <div class="preview-box">
+          <div class="editor-header">
+            <span>خروجی زنده (Live Output)</span>
+          </div>
+          <iframe id="liveCodePreview" class="preview-iframe"></iframe>
+        </div>
+      </div>
+    </section>
+  </div>
 
   <!-- فوتر -->
   <footer>
@@ -739,10 +864,104 @@
       size: 0.60,
       backgroundColor: 0xf5f5f7
     });
+
+    // =========================================================
+    // مدیریت سیستم ناوبری (Single Page + Editor View)
+    // =========================================================
+    const mainView = document.getElementById('main-view');
+    const editorView = document.getElementById('editor-view');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    function updateActiveNav(targetName) {
+      navLinks.forEach(link => {
+        if (link.getAttribute('data-target') === targetName) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+
+    // هدایت به بخش‌های مختلف صفحه اصلی تک‌صفحه‌ای
+    function navigateToSection(sectionId) {
+      if (mainView.classList.contains('hidden')) {
+        mainView.classList.remove('hidden');
+        editorView.classList.add('hidden');
+      }
+
+      updateActiveNav(sectionId);
+
+      const targetEl = document.getElementById(sectionId);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // باز کردن صفحه مجزای ویرایشگر کد
+    function openEditorPage() {
+      mainView.classList.add('hidden');
+      editorView.classList.remove('hidden');
+      updateActiveNav('editor');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // =========================================================
+    // سیستم کدنویسی زنده (Live Code Editor)                      
+    // =========================================================
+    const liveInput = document.getElementById("liveCodeInput");
+    const livePreview = document.getElementById("liveCodePreview");
+    const resetCodeBtn = document.getElementById("resetCodeBtn");
+
+    const defaultCode = `<style>
+  body {
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background: #0f1115;
+    color: #fff;
+  }
+  .card {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  h2 { color: #ee0045; margin-bottom: 10px; }
+</style>
+
+<div class="card">
+  <h2>Nexora Studio</h2>
+  <p>ویرایشگر زنده کد به خوبی کار می‌کند!</p>
+</div>`;
+
+    function updateCodePreview() {
+      if (!liveInput || !livePreview) return;
+      const previewDoc = livePreview.contentDocument || livePreview.contentWindow.document;
+      previewDoc.open();
+      previewDoc.write(liveInput.value);
+      previewDoc.close();
+    }
+
+    if (liveInput && livePreview) {
+      liveInput.addEventListener("input", updateCodePreview);
+      updateCodePreview();
+    }
+
+    if (resetCodeBtn) {
+      resetCodeBtn.addEventListener("click", () => {
+        liveInput.value = defaultCode;
+        updateCodePreview();
+      });
+    }
   </script>
 
   <!-- ========================================================= -->
-  <!-- Supabase (ذخیره‌سازی دائمی نمونه‌کارها)                    -->
+  <!-- Supabase (ذخیره‌سازی نمونه‌کارها)                         -->
   <!-- ========================================================= -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script>
@@ -751,8 +970,6 @@
 
     const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // رمز ساده ورود به پنل مدیریت — این فقط جلوی کاربر عادی رو می‌گیره.
-    // امنیت واقعی داده‌ها از طریق Row Level Security توی Supabase تأمین می‌شود.
     const ADMIN_PASSWORD = "fariborz";
     let isAdmin = false;
 
